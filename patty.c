@@ -10,15 +10,19 @@
 #include <string.h>
 #define MAX 1000000
 
-//estrutura da Árvore Patricia
+// Estrutura da Árvore Patricia
 
 struct nodo {
     char * prefixo, *flag;
     struct nodo *p[26];
 };
 
-// declarando raiz
+// Declarando raiz
 struct nodo *root = NULL;
+
+// Protótipos de funções
+void read_word(int argc, char** argv);
+
 
 /**
  * 
@@ -30,6 +34,7 @@ int main(int argc, char** argv) {
     FILE *arquivo;
     long tamanho;
 
+    printf("\nIniciando programa...\n");
 
     arquivo = fopen(argv[1], "r");
 
@@ -39,8 +44,11 @@ int main(int argc, char** argv) {
         // current position in the file
         tamanho = ftell(arquivo);
         //FILE * Tamarq[tamanho*tamanho];
-        FILE * Tamarq[tamanho];
+        FILE * Tamarq[tamanho];       
     }
+    
+    //funçao para ler as palavras do arquivo
+    read_word(argc, argv);
 
     return (EXIT_SUCCESS);
 }
@@ -55,6 +63,7 @@ void read_word(int argc, char** argv) {
     int i;
     char caracter, word[MAX];
     //long tamanho;
+    printf("\nFunção de leitura de palavras...\n");
 
     if ((arquivo = fopen(argv[1], "r")) == NULL) {
         printf("Erro ao abrir arquivo!!!\n\n");
@@ -85,7 +94,7 @@ void read_word(int argc, char** argv) {
  * @param p ponteiro para estrutura
  */
 void inserir(char *palavra, struct nodo **p) {
-    int i, count, j;
+    int i, count = 0, j;
 
     int tam_prefixo = strlen((*p)->prefixo);
     
