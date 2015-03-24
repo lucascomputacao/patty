@@ -23,7 +23,6 @@ struct nodo *root = NULL;
 // Protótipos de funções
 void read_word(int argc, char** argv);
 
-
 /**
  * 
  * @param argc
@@ -44,9 +43,9 @@ int main(int argc, char** argv) {
         // current position in the file
         tamanho = ftell(arquivo);
         //FILE * Tamarq[tamanho*tamanho];
-        FILE * Tamarq[tamanho];       
+        FILE * Tamarq[tamanho];
     }
-    
+
     //funçao para ler as palavras do arquivo
     read_word(argc, argv);
 
@@ -60,7 +59,7 @@ int main(int argc, char** argv) {
  */
 void read_word(int argc, char** argv) {
     FILE *arquivo;
-    int i;
+    int i, count = 0;
     char caracter, word[MAX];
     //long tamanho;
     printf("\nFunção de leitura de palavras...\n");
@@ -81,8 +80,9 @@ void read_word(int argc, char** argv) {
         }
         // word's insertion
         if (i) {
+            count++; //contador de palavras
             word[i] = '\0';
-            printf(" word: %s\n", word);
+            printf(" word[%i]: %s\n",count, word);
         }
     }
     fclose(arquivo);
@@ -97,7 +97,7 @@ void inserir(char *palavra, struct nodo **p) {
     int i, count = 0, j;
 
     int tam_prefixo = strlen((*p)->prefixo);
-    
+
     if (*p == NULL) {
         *p = calloc(1, sizeof (struct nodo));
         (*p)->prefixo = strdup(palavra);
@@ -116,7 +116,7 @@ void inserir(char *palavra, struct nodo **p) {
             struct nodo * pai = calloc(1, sizeof (struct nodo));
             pai->prefixo = strndup((*p)->prefixo, i);
             pai->flag = calloc(i + 1, sizeof (char));
-            for ( j = 0; j < count; ++j)
+            for (j = 0; j < count; ++j)
                 pai->flag[j] = (*p)->flag[j];
             inserir(palavra + i + 1, &pai->p[palavra[i] - 'a']);
             pai->p[(*p)->prefixo[i] - 'a'] = *p;
