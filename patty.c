@@ -22,6 +22,9 @@ struct nodo *root = NULL;
 
 // Protótipos de funções
 void read_word(int argc, char** argv);
+void inserir(char* palavra, struct nodo **p);
+
+
 
 /**
  * 
@@ -83,6 +86,7 @@ void read_word(int argc, char** argv) {
             count++; //contador de palavras
             word[i] = '\0';
             printf(" word[%i]: %s\n",count, word);
+            inserir(word,&root);
         }
     }
     fclose(arquivo);
@@ -95,21 +99,29 @@ void read_word(int argc, char** argv) {
  */
 void inserir(char *palavra, struct nodo **p) {
     int i, count = 0, j;
+    //int tam_prefixo = strlen((*p)->prefixo);
+/*
+    long tamPrefixo;
+    tamPrefixo = strlen((*p)->prefixo);
+*/
+    
+   // printf("\ntamanho do prefixo: %i", tamPrefixo);
 
-    int tam_prefixo = strlen((*p)->prefixo);
-
+    printf("\npalavra: %s", palavra);
+    printf("\nponteiro: %p", p);
+    
     if (*p == NULL) {
         *p = calloc(1, sizeof (struct nodo));
         (*p)->prefixo = strdup(palavra);
         (*p)->flag = calloc(strlen(palavra) + 1, sizeof (char)); // +1 para incluir o '\0'
         (*p)->flag[strlen(palavra)] = 1;
     }
-    for (i = 0; i < tam_prefixo; ++i) {
+    for (i = 0; i < strlen((*p)->prefixo); ++i) {
         if (palavra[i] != (*p)->prefixo[i])
             break; //ou palavra acabou ou as letras são diferentes
     }
 
-    if (i < tam_prefixo) {
+    if (i < strlen((*p)->prefixo)) {
         if (palavra[i] == '\0')
             (*p)->flag[i] = 1;
         else {
