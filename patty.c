@@ -23,6 +23,7 @@ struct nodo *root = NULL;
 // Protótipos de funções
 void read_word(int argc, char** argv);
 void inserir(char* palavra, struct nodo **p);
+void imprimir(struct nodo** root);
 
 
 
@@ -51,6 +52,9 @@ int main(int argc, char** argv) {
 
     //funçao para ler as palavras do arquivo
     read_word(argc, argv);
+    
+    // Função de impressão
+    imprimir(&root);
 
     return (EXIT_SUCCESS);
 }
@@ -98,15 +102,8 @@ void read_word(int argc, char** argv) {
  * @param p ponteiro para estrutura
  */
 void inserir(char *palavra, struct nodo **p) {
-    int i, count = 0, j;
-    //int tam_prefixo = strlen((*p)->prefixo);
-/*
-    long tamPrefixo;
-    tamPrefixo = strlen((*p)->prefixo);
-*/
+    int i, count = 0, j, tamPrefix;
     
-   // printf("\ntamanho do prefixo: %i", tamPrefixo);
-
     printf("\npalavra: %s", palavra);
     printf("\nponteiro: %p", p);
     
@@ -116,12 +113,15 @@ void inserir(char *palavra, struct nodo **p) {
         (*p)->flag = calloc(strlen(palavra) + 1, sizeof (char)); // +1 para incluir o '\0'
         (*p)->flag[strlen(palavra)] = 1;
     }
-    for (i = 0; i < strlen((*p)->prefixo); ++i) {
+    
+    tamPrefix = strlen((*p)->prefixo);
+    
+    for (i = 0; i < tamPrefix; ++i) {
         if (palavra[i] != (*p)->prefixo[i])
             break; //ou palavra acabou ou as letras são diferentes
     }
 
-    if (i < strlen((*p)->prefixo)) {
+    if (i < tamPrefix) {
         if (palavra[i] == '\0')
             (*p)->flag[i] = 1;
         else {
@@ -150,8 +150,9 @@ void inserir(char *palavra, struct nodo **p) {
             if (j < 26)
                 inserir(palavra + i + 1, &(*p)->p[palavra[i] - 'a']);
             else {
-                (*p)->flag = realloc((*p)->flag, strlen(palavra) + 1);
-                for (j = strlen((*p)->prefixo) + 1; j < strlen(palavra); j++)
+                int tamPalavra = strlen(palavra);
+                (*p)->flag = realloc((*p)->flag, tamPalavra + 1);
+                for (j = tamPrefix + 1; j < tamPalavra; j++)
                     (*p)->flag[j] = 0;
                 (*p)->flag[j] = 1;
                 free((*p)->prefixo);
@@ -160,4 +161,12 @@ void inserir(char *palavra, struct nodo **p) {
 
         }
     }
+}
+
+void imprimir(struct nodo** root){
+    if(root == NULL){
+        printf("\n Árvore vazia");
+        return;
+    }
+    printf("\n Árvore não-vazia\n");
 }
