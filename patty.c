@@ -25,8 +25,6 @@ void read_word(int argc, char** argv);
 void inserir(char* palavra, struct nodo **p);
 void imprimir(struct nodo** root);
 
-
-
 /**
  * 
  * @param argc
@@ -52,7 +50,7 @@ int main(int argc, char** argv) {
 
     //funçao para ler as palavras do arquivo
     read_word(argc, argv);
-    
+
     // Função de impressão
     imprimir(&root);
 
@@ -89,8 +87,8 @@ void read_word(int argc, char** argv) {
         if (i) {
             count++; //contador de palavras
             word[i] = '\0';
-            printf(" word[%i]: %s\n",count, word);
-            inserir(word,&root);
+            printf(" word[%i]: %s\n", count, word);
+            inserir(word, &root);
         }
     }
     fclose(arquivo);
@@ -103,19 +101,19 @@ void read_word(int argc, char** argv) {
  */
 void inserir(char *palavra, struct nodo **p) {
     int i, count = 0, j, tamPrefix;
-    
+
     printf("\npalavra: %s", palavra);
     printf("\nponteiro: %p", p);
-    
+
     if (*p == NULL) {
         *p = calloc(1, sizeof (struct nodo));
         (*p)->prefixo = strdup(palavra);
         (*p)->flag = calloc(strlen(palavra) + 1, sizeof (char)); // +1 para incluir o '\0'
         (*p)->flag[strlen(palavra)] = 1;
     }
-    
+
     tamPrefix = strlen((*p)->prefixo);
-    
+
     for (i = 0; i < tamPrefix; ++i) {
         if (palavra[i] != (*p)->prefixo[i])
             break; //ou palavra acabou ou as letras são diferentes
@@ -128,7 +126,8 @@ void inserir(char *palavra, struct nodo **p) {
             struct nodo * pai = calloc(1, sizeof (struct nodo));
             pai->prefixo = strndup((*p)->prefixo, i);
             pai->flag = calloc(i + 1, sizeof (char));
-            for (j = 0; j < count; ++j)
+            // Copiando as flags
+            for (j = 0; j < tamPrefix; ++j)
                 pai->flag[j] = (*p)->flag[j];
             inserir(palavra + i + 1, &pai->p[palavra[i] - 'a']);
             pai->p[(*p)->prefixo[i] - 'a'] = *p;
@@ -163,10 +162,25 @@ void inserir(char *palavra, struct nodo **p) {
     }
 }
 
-void imprimir(struct nodo** root){
-    if(root == NULL){
+void imprimir(struct nodo** p) {
+    int i, tamPrefix;
+
+    if (p == NULL) {
         printf("\n Árvore vazia");
         return;
     }
-    printf("\n Árvore não-vazia\n");
+
+    tamPrefix = strlen((*p)->prefixo);
+
+    printf("\n[");
+    // Impressão do prefixo
+    for (i = 0; i < tamPrefix; ++i) {
+        printf("\nflag: %d", (*p)->flag[i]);
+        //if ((*p)->prefixo[i] != '\0') {
+        if ((*p)->flag[i + 1] == 1)
+            printf("%c", (*p)->prefixo[i] - 32); // Impressão de maiúsculas
+        else
+            printf("%c", (*p)->prefixo[i]);
+        //}
+    }
 }
