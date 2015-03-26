@@ -37,65 +37,40 @@ void fechaColchetes();
 int main(int argc, char** argv) {
     FILE *arquivo;
     long tamanho;
-
-    printf("\nIniciando programa...\n");
-
-    arquivo = fopen(argv[1], "r");
-
-    if (arquivo != NULL) {
-        // to set the position of the end of the file
-        fseek(arquivo, 0, SEEK_END);
-        // current position in the file
-        tamanho = ftell(arquivo);
-        //FILE * Tamarq[tamanho*tamanho];
-        FILE * Tamarq[tamanho];
-    }
-
-    //funçao para ler as palavras do arquivo
-    read_word(argc, argv);
-
-    // Função de impressão
-    imprimir(&root, 0);
-
-    return (EXIT_SUCCESS);
-}
-
-/**
- * 
- * @param argc
- * @param argv
- */
-void read_word(int argc, char** argv) {
-    FILE *arquivo;
-    int i, count = 0;
+    int i, count, parada = 0;
     char caracter, word[MAX];
-    //long tamanho;
-    printf("\nFunção de leitura de palavras...\n");
 
-    if ((arquivo = fopen(argv[1], "r")) == NULL) {
-        printf("Erro ao abrir arquivo!!!\n\n");
-        exit(1);
-    }
+    // Leitura de palavras
 
     // loop to read characters
     while ((caracter) != EOF) {
         i = 0;
-        caracter = fgetc(arquivo);
+        //caracter = fgetc(arquivo);
+        //printf("\ndigite uma palavra");
+        caracter = getchar();
         while ((caracter >= 65) && (caracter <= 122)) { //A-z
             word[i] = caracter;
-            caracter = fgetc(arquivo);
+            //caracter = fgetc(arquivo);
+            caracter = getchar();
             i++;
         }
         // word's insertion
         if (i) {
             count++; //contador de palavras
             word[i] = '\0';
-            printf(" word[%i]: %s\n", count, word);
+            // printf(" word[%i]: %s\n", count, word);
             inserir(word, &root);
         }
     }
-    fclose(arquivo);
+
+    // Função de impressão
+    imprimir(&root, 0);
+
+    printf("\n");
+
+    return (EXIT_SUCCESS);
 }
+
 
 /**
  * 
@@ -105,10 +80,12 @@ void read_word(int argc, char** argv) {
 void inserir(char *palavra, struct nodo **p) {
     int i = 0, count = 0, j, tamPrefix;
 
-    printf("\npalavra: %s", palavra);
-    printf("\nponteiro: %p\n", p);
+    /*
+        printf("\npalavra: %s", palavra);
+        printf("\nponteiro: %p\n", p);
+     */
 
-   
+
 
     if (*p == NULL) {
         *p = calloc(1, sizeof (struct nodo));
@@ -174,7 +151,7 @@ void imprimir(struct nodo** p, int filho) {
     int i, j, tamPrefix, contaColhetes = 0;
 
     if (p == NULL) {
-        printf("\n Árvore vazia");
+        //printf("\n Árvore vazia");
         return;
     }
 
