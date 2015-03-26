@@ -26,6 +26,7 @@ void inserir(char* palavra, struct nodo **p);
 void imprimir(struct nodo** root, int filho);
 void abreColchetes();
 void fechaColchetes();
+int verifica(struct nodo** p);
 
 /**
  * 
@@ -50,6 +51,7 @@ int main(int argc, char** argv) {
         if (i) {
             count++; //contador de palavras
             word[i] = '\0';
+            //printf("word: %s", word);
             inserir(word, &root);
         }
     }
@@ -57,7 +59,7 @@ int main(int argc, char** argv) {
     // Função de impressão
     imprimir(&root, 0);
 
-    printf("\n");
+    //printf("\n");
 
     return (EXIT_SUCCESS);
 }
@@ -131,7 +133,7 @@ void inserir(char *palavra, struct nodo **p) {
 }
 
 void imprimir(struct nodo** p, int filho) {
-    int i, j, tamPrefix;
+    int i, j, tamPrefix, verif = 0;
 
     if (p == NULL) {
         return;
@@ -143,7 +145,6 @@ void imprimir(struct nodo** p, int filho) {
     }
 
     // Impressão do prefixo
-
     for (i = 0; i < tamPrefix; ++i) {
         //printf("\nflag: %d", (*p)->flag[i]);
 
@@ -156,24 +157,30 @@ void imprimir(struct nodo** p, int filho) {
     // Verificar se há filhos
     for (j = 0; j < TAMALFABETO; ++j) {
         if ((*p)->p[j] != NULL) {
-            // printf("\n%d:", j);
             abreColchetes();
-            //
-            if (strlen((*p)->p[j]->prefixo) == 0) {
-                if (filho == 2)
+
+            if (strlen((*p)->p[j]->prefixo) > 0) {
+                if ((*p)->p[j]->flag[0] == 1) {
                     printf("%c", j + 65);
-                else
+                } else
                     printf("%c", j + 97);
                 imprimir(&(*p)->p[j], 2);
-                // break;
-            } else {
-                printf("%c", j + 97); // Imprime a letra correspondente ao ponteiro
-                imprimir(&(*p)->p[j], 1);
             }
+            // casa, caso
+            if (strlen((*p)->p[j]->prefixo) == 0) {
+                verif = verifica(&(*p)->p[j]);
+                if (verif == 1)
+                    printf("%c", j + 97);
+                else
+                    printf("%c", j + 65);
+                imprimir(&(*p)->p[j], 2);
+            }
+
+
+
         }
     }
 
-    // Fechando chaves dos filhos
     fechaColchetes();
 }
 
@@ -183,4 +190,23 @@ void abreColchetes() {
 
 void fechaColchetes() {
     printf("]");
+}
+
+/**
+ * @param p
+ * @return 1, caso haja um ponteirio válido
+ */
+int verifica(struct nodo** p) {
+    int tamPrefix, j;
+
+    tamPrefix = strlen((*p)->prefixo);
+
+    if (tamPrefix == 0) {
+        for (j = 0; j < TAMALFABETO; ++j) {
+            if ((*p)->p[j] != NULL)
+                return 1;
+        }
+    }
+
+    return 0;
 }
