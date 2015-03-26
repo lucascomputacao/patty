@@ -22,7 +22,6 @@ struct nodo {
 struct nodo *root = NULL;
 
 // Protótipos de funções
-void read_word(int argc, char** argv);
 void inserir(char* palavra, struct nodo **p);
 void imprimir(struct nodo** root, int filho);
 void abreColchetes();
@@ -35,22 +34,15 @@ void fechaColchetes();
  * @return 
  */
 int main(int argc, char** argv) {
-    FILE *arquivo;
-    long tamanho;
-    int i, count, parada = 0;
+    int i, count;
     char caracter, word[MAX];
-
-    // Leitura de palavras
 
     // loop to read characters
     while ((caracter) != EOF) {
         i = 0;
-        //caracter = fgetc(arquivo);
-        //printf("\ndigite uma palavra");
         caracter = getchar();
         while ((caracter >= 65) && (caracter <= 122)) { //A-z
             word[i] = caracter;
-            //caracter = fgetc(arquivo);
             caracter = getchar();
             i++;
         }
@@ -58,7 +50,6 @@ int main(int argc, char** argv) {
         if (i) {
             count++; //contador de palavras
             word[i] = '\0';
-            // printf(" word[%i]: %s\n", count, word);
             inserir(word, &root);
         }
     }
@@ -71,21 +62,13 @@ int main(int argc, char** argv) {
     return (EXIT_SUCCESS);
 }
 
-
 /**
  * 
  * @param palavra string
  * @param p ponteiro para estrutura
  */
 void inserir(char *palavra, struct nodo **p) {
-    int i = 0, count = 0, j, tamPrefix;
-
-    /*
-        printf("\npalavra: %s", palavra);
-        printf("\nponteiro: %p\n", p);
-     */
-
-
+    int i = 0, j, tamPrefix;
 
     if (*p == NULL) {
         *p = calloc(1, sizeof (struct nodo));
@@ -148,17 +131,13 @@ void inserir(char *palavra, struct nodo **p) {
 }
 
 void imprimir(struct nodo** p, int filho) {
-    int i, j, tamPrefix, contaColhetes = 0;
+    int i, j, tamPrefix;
 
     if (p == NULL) {
-        //printf("\n Árvore vazia");
         return;
     }
 
     tamPrefix = strlen((*p)->prefixo);
-    //printf("\ntamanho do prefixo: %d", tamPrefix);
-
-    //printf("\n[");
     if (filho == 0) {
         abreColchetes();
     }
