@@ -14,7 +14,7 @@
 // Estrutura da Árvore Patricia
 
 struct nodo {
-    char * prefixo, *flag;
+    char *prefixo, *flag;
     struct nodo *p[26];
 };
 
@@ -59,21 +59,83 @@ int main(int argc, char** argv) {
     // Função de impressão
     imprimir(&root, 0);
 
-    //printf("\n");
+    printf("\n");
 
     return (EXIT_SUCCESS);
 }
+
+void inserir(char *palavra, struct nodo** p) {
+    int i, j;
+
+    if (*p == NULL) {
+        (*p) = calloc(1, sizeof (struct nodo));
+        (*p)->prefixo = strdup(palavra);
+        (*p)->flag = calloc(strlen(palavra) + 1, sizeof (char));
+        (*p)->flag[strlen(palavra)] = 1;
+    }
+
+    for (i = 0; i < strlen((*p)->prefixo); i++)
+        if (palavra[i] != (*p)->prefixo[i])
+            break;
+
+    if (i < strlen((*p)->prefixo)) {
+        if (palavra[i] == '\0')
+            (*p)->flag[i] = 1;
+        else {
+            struct nodo *pai = calloc(1, sizeof (struct nodo));
+            pai->prefixo = strndup((*p)->prefixo, i);
+            pai->flag = calloc(i + 1, sizeof (char));
+
+            for (j = 0; j <= i; j++)
+                pai->flag[j] = (*p)->flag[j];
+
+            inserir(palavra + i + 1, &pai->p[palavra[i] - 'a']);
+            pai->p[(*p)->prefixo[i] - 'a'] = *p;
+            j = (strlen((*p)->prefixo) - i) * sizeof (char); // ver se é +1 ou +i
+
+            memmove((*p)->prefixo, (*p)->prefixo + i + 1, j);
+            (*p)->prefixo = realloc((*p)->prefixo, j);
+
+            memmove((*p)->flag, (*p)->flag + i + 1, j);
+            (*p)->flag = realloc((*p)->flag, j);
+
+            *p = pai; //seta o root como pai
+
+        }
+    } else if (palavra[i] == '\0') {
+        (*p)->flag[i] = 1;
+    } else {
+        for (j = 0; j < 26; j++)
+            if ((*p)->p[j] != NULL)
+                break;
+        if (j < 26)
+            inserir(palavra + i + 1, &(*p)->p[palavra[i] - 'a']);
+        else { //aumenta o prefixo
+            (*p)->flag = realloc((*p)->flag, strlen(palavra) + 1);
+            for (j = strlen((*p)->prefixo) + 1; j < strlen(palavra); j++)
+                (*p)->flag[j] = 0;
+            (*p)->flag[j] = 1;
+            free((*p)->prefixo);
+
+            (*p)->prefixo = strdup(palavra);
+        }
+    }
+}
+
 
 /**
  * 
  * @param palavra string
  * @param p ponteiro para estrutura
  */
+
+/*
+
 void inserir(char *palavra, struct nodo **p) {
     int i = 0, j, tamPrefix;
 
     if (*p == NULL) {
-        *p = calloc(1, sizeof (struct nodo));
+ *p = calloc(1, sizeof (struct nodo));
         (*p)->prefixo = strdup(palavra);
         (*p)->flag = calloc(strlen(palavra) + 1, sizeof (char)); // +1 para incluir o '\0'
         (*p)->flag[strlen(palavra)] = 1;
@@ -106,7 +168,7 @@ void inserir(char *palavra, struct nodo **p) {
             (*p)->prefixo = realloc((*p)->prefixo, j);
             memmove((*p)->flag, (*p)->flag + i + 1, j);
             (*p)->flag = realloc((*p)->flag, j);
-            *p = pai;
+ *p = pai;
         }
     } else {
         if (palavra[i] == '\0')
@@ -131,6 +193,7 @@ void inserir(char *palavra, struct nodo **p) {
         }
     }
 }
+ */
 
 void imprimir(struct nodo** p, int filho) {
     int i, j, tamPrefix, verif = 0;
