@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define MAX 1000000
+#define TAMALFABETO 26
 
 // Estrutura da Árvore Patricia
 
@@ -23,7 +24,9 @@ struct nodo *root = NULL;
 // Protótipos de funções
 void read_word(int argc, char** argv);
 void inserir(char* palavra, struct nodo **p);
-void imprimir(struct nodo** root);
+void imprimir(struct nodo** root, int filho);
+void abreColchetes();
+void fechaColchetes();
 
 /**
  * 
@@ -52,7 +55,7 @@ int main(int argc, char** argv) {
     read_word(argc, argv);
 
     // Função de impressão
-    imprimir(&root);
+    imprimir(&root, 0);
 
     return (EXIT_SUCCESS);
 }
@@ -100,10 +103,12 @@ void read_word(int argc, char** argv) {
  * @param p ponteiro para estrutura
  */
 void inserir(char *palavra, struct nodo **p) {
-    int i, count = 0, j, tamPrefix;
+    int i = 0, count = 0, j, tamPrefix;
 
     printf("\npalavra: %s", palavra);
-    printf("\nponteiro: %p", p);
+    printf("\nponteiro: %p\n", p);
+
+   
 
     if (*p == NULL) {
         *p = calloc(1, sizeof (struct nodo));
@@ -129,7 +134,10 @@ void inserir(char *palavra, struct nodo **p) {
             // Copiando as flags
             for (j = 0; j < tamPrefix; ++j)
                 pai->flag[j] = (*p)->flag[j];
-            inserir(palavra + i + 1, &pai->p[palavra[i] - 'a']);
+            if (palavra + i + 1 != '\0') {
+                inserir(palavra + i + 1, &pai->p[palavra[i] - 'a']);
+            }
+
             pai->p[(*p)->prefixo[i] - 'a'] = *p;
             j = (strlen((*p)->prefixo) - i) * sizeof (char);
             memmove((*p)->prefixo, (*p)->prefixo + i + 1, j);
@@ -162,8 +170,8 @@ void inserir(char *palavra, struct nodo **p) {
     }
 }
 
-void imprimir(struct nodo** p) {
-    int i, tamPrefix;
+void imprimir(struct nodo** p, int filho) {
+    int i, j, tamPrefix, contaColhetes = 0;
 
     if (p == NULL) {
         printf("\n Árvore vazia");
@@ -171,16 +179,52 @@ void imprimir(struct nodo** p) {
     }
 
     tamPrefix = strlen((*p)->prefixo);
+    //printf("\ntamanho do prefixo: %d", tamPrefix);
 
-    printf("\n[");
+    //printf("\n[");
+    if (filho == 0) {
+        abreColchetes();
+    }
+
     // Impressão do prefixo
+
     for (i = 0; i < tamPrefix; ++i) {
-        printf("\nflag: %d", (*p)->flag[i]);
-        //if ((*p)->prefixo[i] != '\0') {
+        //printf("\nflag: %d", (*p)->flag[i]);
+
         if ((*p)->flag[i + 1] == 1)
             printf("%c", (*p)->prefixo[i] - 32); // Impressão de maiúsculas
         else
             printf("%c", (*p)->prefixo[i]);
-        //}
     }
+
+    // Verificar se há filhos
+    for (j = 0; j < TAMALFABETO; ++j) {
+        if ((*p)->p[j] != NULL) {
+            // printf("\n%d:", j);
+            abreColchetes();
+            //
+            if (strlen((*p)->p[j]->prefixo) == 0) {
+                if (filho == 2)
+                    printf("%c", j + 65);
+                else
+                    printf("%c", j + 97);
+                imprimir(&(*p)->p[j], 2);
+                // break;
+            } else {
+                printf("%c", j + 97); // Imprime a letra correspondente ao ponteiro
+                imprimir(&(*p)->p[j], 1);
+            }
+        }
+    }
+
+    // Fechando chaves dos filhos
+    fechaColchetes();
+}
+
+void abreColchetes() {
+    printf("[");
+}
+
+void fechaColchetes() {
+    printf("]");
 }
