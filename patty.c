@@ -23,7 +23,8 @@ struct nodo *root = NULL;
 
 // Protótipos de funções
 void inserir(char* palavra, struct nodo **p);
-void imprimir(struct nodo** root, int filho);
+//void imprimir(struct nodo** root, int filho);
+void imprimir(struct nodo** root, int control);
 void abreColchetes();
 void fechaColchetes();
 int verifica(struct nodo** p);
@@ -35,7 +36,7 @@ int verifica(struct nodo** p);
  * @return 
  */
 int main(int argc, char** argv) {
-    int i, count;
+    int i, count = 0;
     char caracter, word[MAX];
 
     // loop to read characters
@@ -51,12 +52,13 @@ int main(int argc, char** argv) {
         if (i) {
             count++; //contador de palavras
             word[i] = '\0';
-            //printf("word: %s", word);
+            //printf("word:%s", word);
             inserir(word, &root);
         }
     }
 
     // Função de impressão
+    //imprimir(&root, 0);
     imprimir(&root, 0);
 
     printf("\n");
@@ -122,154 +124,50 @@ void inserir(char *palavra, struct nodo** p) {
     }
 }
 
+void imprimir(struct nodo** p, int control) {
+    int tamPrefix, i, j;
 
-/**
- * 
- * @param palavra string
- * @param p ponteiro para estrutura
- */
-
-/*
-
-void inserir(char *palavra, struct nodo **p) {
-    int i = 0, j, tamPrefix;
-
-    if (*p == NULL) {
- *p = calloc(1, sizeof (struct nodo));
-        (*p)->prefixo = strdup(palavra);
-        (*p)->flag = calloc(strlen(palavra) + 1, sizeof (char)); // +1 para incluir o '\0'
-        (*p)->flag[strlen(palavra)] = 1;
-    }
-
-    tamPrefix = strlen((*p)->prefixo);
-
-    for (i = 0; i < tamPrefix; ++i) {
-        if (palavra[i] != (*p)->prefixo[i])
-            break; //ou palavra acabou ou as letras são diferentes
-    }
-
-    if (i < tamPrefix) {
-        if (palavra[i] == '\0')
-            (*p)->flag[i] = 1;
-        else {
-            struct nodo * pai = calloc(1, sizeof (struct nodo));
-            pai->prefixo = strndup((*p)->prefixo, i);
-            pai->flag = calloc(i + 1, sizeof (char));
-            // Copiando as flags
-            for (j = 0; j < tamPrefix; ++j)
-                pai->flag[j] = (*p)->flag[j];
-            if (palavra + i + 1 != '\0') {
-                inserir(palavra + i + 1, &pai->p[palavra[i] - 'a']);
-            }
-
-            pai->p[(*p)->prefixo[i] - 'a'] = *p;
-            j = (strlen((*p)->prefixo) - i) * sizeof (char);
-            memmove((*p)->prefixo, (*p)->prefixo + i + 1, j);
-            (*p)->prefixo = realloc((*p)->prefixo, j);
-            memmove((*p)->flag, (*p)->flag + i + 1, j);
-            (*p)->flag = realloc((*p)->flag, j);
- *p = pai;
-        }
-    } else {
-        if (palavra[i] == '\0')
-            (*p)->flag[i] = 1;
-        else {
-            for (j = 0; j < 26; ++j) {
-                if ((*p)->p[j] != NULL)
-                    break;
-            }
-            if (j < 26)
-                inserir(palavra + i + 1, &(*p)->p[palavra[i] - 'a']);
-            else {
-                int tamPalavra = strlen(palavra);
-                (*p)->flag = realloc((*p)->flag, tamPalavra + 1);
-                for (j = tamPrefix + 1; j < tamPalavra; j++)
-                    (*p)->flag[j] = 0;
-                (*p)->flag[j] = 1;
-                free((*p)->prefixo);
-                (*p)->prefixo = strdup(palavra);
-            }
-
-        }
-    }
-}
- */
-
-void imprimir(struct nodo** p, int filho) {
-    int i, j, tamPrefix, verif = 0;
-
-    if (p == NULL) {
+    // Árvore vazia
+    if ((*p) == NULL) {
+         printf("[]");
         return;
     }
 
+    // Controla a abertura indevida de colchetes
+    if (control == 0)
+        printf("[");
+
+    // Tamanho do prefixo
     tamPrefix = strlen((*p)->prefixo);
-    if (filho == 0) {
-        abreColchetes();
-    }
 
-    // Impressão do prefixo
-    for (i = 0; i < tamPrefix; ++i) {
-        //printf("\nflag: %d", (*p)->flag[i]);
+    if (tamPrefix > 0) {
+        // Impressão do prefixo
 
-        if ((*p)->flag[i + 1] == 1)
-            printf("%c", (*p)->prefixo[i] - 32); // Impressão de maiúsculas
-        else
-            printf("%c", (*p)->prefixo[i]);
+        for (i = 0; i < tamPrefix; ++i) {
+            //printf("\nflag: %d", (*p)->flag[i]);
+
+            if ((*p)->flag[i + 1] == 1)
+                printf("%c", (*p)->prefixo[i] - 32); // Impressão de maiúsculas
+            if ((*p)->flag[i + 1] == 0)
+                printf("%c", (*p)->prefixo[i]);
+        }
     }
 
     // Verificar se há filhos
     for (j = 0; j < TAMALFABETO; ++j) {
         if ((*p)->p[j] != NULL) {
-            abreColchetes();
+            printf("[");
 
-            if (strlen((*p)->p[j]->prefixo) > 0) {
-                if ((*p)->p[j]->flag[0] == 1) {
-                    printf("%c", j + 65);
-                } else
-                    printf("%c", j + 97);
-                imprimir(&(*p)->p[j], 2);
+            if ((strlen((*p)->p[j]->prefixo) == 0 && (*p)->p[j]->flag[0] == 1)
+                    || (*p)->p[j]->flag[0] == 1) {
+                printf("%c", j + 65);
+            } else {
+                printf("%c", j + 97);
             }
-            // casa, caso
-            if (strlen((*p)->p[j]->prefixo) == 0) {
-                verif = verifica(&(*p)->p[j]);
-                if (verif == 1)
-                    printf("%c", j + 97);
-                else
-                    printf("%c", j + 65);
-                imprimir(&(*p)->p[j], 2);
-            }
-
-
-
+            imprimir(&(*p)->p[j], 1);
         }
     }
-
-    fechaColchetes();
-}
-
-void abreColchetes() {
-    printf("[");
-}
-
-void fechaColchetes() {
+    // Fechando colchetes
     printf("]");
 }
 
-/**
- * @param p
- * @return 1, caso haja um ponteirio válido
- */
-int verifica(struct nodo** p) {
-    int tamPrefix, j;
-
-    tamPrefix = strlen((*p)->prefixo);
-
-    if (tamPrefix == 0) {
-        for (j = 0; j < TAMALFABETO; ++j) {
-            if ((*p)->p[j] != NULL)
-                return 1;
-        }
-    }
-
-    return 0;
-}
